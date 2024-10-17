@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">WorkTestComposeProject</string>
     <string name="phone_number">Phone number</string>
+    <string name="code">Code</string>
+    <string name="name">Fullname</string>
+    <string name="username">Username</string>
 </resources>

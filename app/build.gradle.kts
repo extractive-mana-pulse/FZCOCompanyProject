@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.serialization)
+    id ("kotlin-kapt")
+    id ("dagger.hilt.android.plugin")
 }
 
 android {
@@ -22,12 +24,16 @@ android {
     }
 
     buildTypes {
+        debug {
+            buildConfigField ("String", "BASE_URL", "\"https://plannerok.ru/\"")
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            buildConfigField ("String", "BASE_URL", "\"https://plannerok.ru/\"")
         }
     }
     compileOptions {
@@ -39,6 +45,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"
@@ -61,7 +68,6 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.navigation.runtime.ktx)
-    implementation(libs.androidx.navigation.compose)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -71,7 +77,8 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
     // Country picker.
-    implementation(libs.cmp.country.code.picker)
+    implementation(libs.androidx.material)
+    implementation(libs.jetpack.compose.country.code.picker.emoji)
 
     // Gson
     implementation (libs.gson)
@@ -82,4 +89,20 @@ dependencies {
     // Type-safe navigation
     implementation(libs.navigation.compose)
     implementation(libs.kotlinx.serialization.json)
+
+    // Hilt navigation for Compose
+    implementation (libs.androidx.hilt.navigation.compose)
+
+    // Hilt dependencies
+    implementation (libs.hilt.android)
+    kapt (libs.hilt.compiler)
+
+    // Retrofit
+    implementation (libs.retrofit)
+    implementation (libs.converter.gson)
+    implementation (libs.okhttp3.logging.interceptor)
+
+    // VM
+    implementation (libs.androidx.lifecycle.viewmodel.compose)
+    implementation (libs.androidx.lifecycle.livedata.ktx)
 }

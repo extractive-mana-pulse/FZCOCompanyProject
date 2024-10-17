@@ -1,5 +1,6 @@
 package com.example.worktestcomposeproject
 
+import com.example.worktestcomposeproject.main.presentation.screens.parseJsonUser
 import org.junit.Test
 
 class TestJsonFile {

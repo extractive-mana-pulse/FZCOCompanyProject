@@ -1,4 +1,4 @@
-package com.example.worktestcomposeproject
+package com.example.worktestcomposeproject.model
 
 data class Masks(
     val cc: String,
