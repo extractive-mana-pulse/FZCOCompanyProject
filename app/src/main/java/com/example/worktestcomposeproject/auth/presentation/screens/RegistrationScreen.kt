@@ -1,46 +1,61 @@
 package com.example.worktestcomposeproject.auth.presentation.screens
 
 import android.annotation.SuppressLint
-import android.util.Log
-import android.widget.Toast
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.airbnb.lottie.LottieAnimationView
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.worktestcomposeproject.R
-import com.example.worktestcomposeproject.auth.presentation.vm.AuthResult
 import com.example.worktestcomposeproject.auth.presentation.vm.AuthViewModel
-import com.example.worktestcomposeproject.auth.presentation.vm.CodeResult
-import com.togitech.ccp.component.TogiCountryCodePicker
-import kotlinx.coroutines.launch
 
 @SuppressLint("CoroutineCreationDuringComposition")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -53,15 +68,21 @@ fun RegisterScreen(
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     val viewModel = hiltViewModel<AuthViewModel>()
+    var otpValue by remember { mutableStateOf("") }
     var name: String by rememberSaveable { mutableStateOf("") }
     var username: String by rememberSaveable { mutableStateOf("") }
     var phoneNumber: String by rememberSaveable { mutableStateOf("") }
     var fullPhoneNumber: String by rememberSaveable { mutableStateOf("") }
     var isNumberValid: Boolean by rememberSaveable { mutableStateOf(false) }
+
+    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.message))
+    val progress by animateLottieCompositionAsState(composition)
+
+
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("Register") },
+                title = { Text("") },
                 navigationIcon = {
 
                     IconButton(
@@ -77,85 +98,132 @@ fun RegisterScreen(
             )
         }
     ) { paddingValues ->
-        Column(
-            modifier = modifier
+        Box(
+            modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
+                .background(MaterialTheme.colorScheme.background)
         ) {
-            TogiCountryCodePicker(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 10.dp),
-                onValueChange = { (code, phone), isValid ->
-                    Log.d("CCP", "onValueChange: $code $phone -> $isValid")
-
-                    phoneNumber = phone
-                    fullPhoneNumber = code + phone
-                    isNumberValid = isValid
-                },
-                label = { Text("Phone Number") },
-            )
-
-            EditNumberField(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                value = name,
-                onValueChange = { name = it },
-                label = R.string.name,
-                keyboardOptions = KeyboardOptions.Default.copy(
-                    keyboardType = KeyboardType.Text,
-                    imeAction = ImeAction.Next
-                ),
-                isVisible = true
-            )
-
-            EditNumberField(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                value = username,
-                onValueChange = { username = it },
-                label = R.string.username,
-                keyboardOptions = KeyboardOptions.Default.copy(
-                    keyboardType = KeyboardType.Text,
-                    imeAction = ImeAction.Next
-                ),
-                isVisible = true
-            )
-            Button(
+            Column(
                 modifier = modifier
-                    .padding(vertical = 8.dp, horizontal = 16.dp)
-                    .fillMaxWidth(1f)
-                    .height(56.dp),
-                onClick = {
-                    coroutineScope.launch { viewModel.registration(fullPhoneNumber, name, username) }
-                },
-                enabled = fullPhoneNumber.isNotEmpty() && isNumberValid && name.isNotEmpty() && username.isNotEmpty(),
+                    .fillMaxSize(),
+                verticalArrangement = Arrangement.Top,
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(text = "Next")
-            }
-            coroutineScope.launch {
-                viewModel.regResult.collect {
-                    when(it) {
+                LottieAnimation(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(300.dp),
+                    alignment = Alignment.TopCenter,
+                    composition = composition,
+                    progress = { progress }
+                )
 
-                        is CodeResult.Error -> {
-                            Log.d("Error", it.message)
-                        }
-                        CodeResult.Loading -> {
-                            // TODO
-                        }
-                        is CodeResult.Success -> {
-                            Log.d("token",it.data.token.toString())
-                            Log.d("token: Id",it.data.id.toString())
-                            Log.d("token: Exist",it.data.isUserExist.toString())
-                            Log.d("token: refresh",it.data.refreshToken.toString())
-                            Toast.makeText(context, "You are successfully pass registration your account", Toast.LENGTH_SHORT).show()
-                            navController.navigate(Screens.Home.route)
-                        }
+                Text(
+                    text = "Enter your phone number",
+                    style = MaterialTheme.typography.headlineMedium
+                )
+                Text(
+                    text = "We will send you a code to verify next",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                OtpTextField(
+                    otpText = otpValue,
+                    onOtpTextChange = { value, otpInputFilled ->
+                        otpValue = value
                     }
+                )
+            }
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(16.dp)
+            ) {
+                FloatingActionButton(
+                    modifier = Modifier.size(64.dp),
+                    contentColor = MaterialTheme.colorScheme.primaryContainer,
+                    backgroundColor = MaterialTheme.colorScheme.primaryContainer,
+                    onClick = {
+                        navController.navigate(Screens.InputCredentials.route)
+                    }
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                        contentDescription = "Forward"
+                    )
                 }
             }
         }
     }
+}
+
+@Composable
+fun OtpTextField(
+    modifier: Modifier = Modifier,
+    otpText: String,
+    otpCount: Int = 6,
+    onOtpTextChange: (String, Boolean) -> Unit
+) {
+    LaunchedEffect(Unit) {
+        if (otpText.length > otpCount) {
+            throw IllegalArgumentException("Otp text value must not have more than otpCount: $otpCount characters")
+        }
+    }
+
+    BasicTextField(
+        modifier = modifier,
+        value = TextFieldValue(otpText, selection = TextRange(otpText.length)),
+        onValueChange = {
+            if (it.text.length <= otpCount) {
+                onOtpTextChange.invoke(it.text, it.text.length == otpCount)
+            }
+        },
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
+        decorationBox = {
+            Row(horizontalArrangement = Arrangement.Center) {
+                repeat(otpCount) { index ->
+                    CharView(
+                        index = index,
+                        text = otpText
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                }
+            }
+        }
+    )
+}
+
+@Composable
+private fun CharView(
+    index: Int,
+    text: String
+) {
+    val isFocused = text.length == index
+    val char = when {
+        index == text.length -> ""
+        index > text.length -> ""
+        else -> text[index].toString()
+    }
+    Text(
+        text = char,
+        modifier = Modifier
+            .width(40.dp)
+            .border(
+                1.dp, when {
+                    isFocused -> MaterialTheme.colorScheme.onSurface
+                    else -> MaterialTheme.colorScheme.outlineVariant
+                }, RoundedCornerShape(8.dp)
+            )
+            .padding(2.dp),
+        style = MaterialTheme.typography.headlineMedium,
+        color = if (isFocused) {
+            MaterialTheme.colorScheme.onSurface
+        } else {
+            MaterialTheme.colorScheme.outlineVariant
+        },
+        textAlign = TextAlign.Center
+    )
 }

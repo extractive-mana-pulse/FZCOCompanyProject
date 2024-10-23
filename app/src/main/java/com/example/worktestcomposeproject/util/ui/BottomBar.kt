@@ -3,9 +3,13 @@ package com.example.worktestcomposeproject.util.ui
 import android.annotation.SuppressLint
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.Email
+import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Icon
@@ -35,6 +39,7 @@ data class BottomNavigationItem<T:Any>(
 )
 
 @SuppressLint("RestrictedApi")
+
 @Composable
 fun BottomNavigationBar(
     navController: NavHostController = rememberNavController()
@@ -44,17 +49,16 @@ fun BottomNavigationBar(
     val items = listOf(
         BottomNavigationItem(
             title = "Home",
-            selectedIcon = Icons.Filled.Email,
-            unselectedIcon = Icons.Outlined.Email,
+            selectedIcon = Icons.Filled.Home,
+            unselectedIcon = Icons.Outlined.Home,
             hasNews = false,
-            badgeCount = null,
             route = Screens.Home.route
         ),
         BottomNavigationItem(
-            title = "Profile",
+            title = "Settings",
             selectedIcon = Icons.Filled.Person,
             unselectedIcon = Icons.Outlined.Person,
-            hasNews = false,
+            hasNews = true,
             route = Screens.Profile.route
         ),
     )
@@ -77,9 +81,9 @@ fun BottomNavigationBar(
                     selectedItemIndex = index
                     navController.navigate(item.route) {
                         popUpTo(navController.graph.findStartDestination().id) {
-                            saveState = true
+                            saveState = false
                         }
-                        launchSingleTop = true
+                        launchSingleTop = false
                         restoreState = true
                     }
                 },

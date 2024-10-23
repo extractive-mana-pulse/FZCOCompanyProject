@@ -13,35 +13,34 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import coil3.compose.AsyncImage
 import com.example.worktestcomposeproject.R
 import com.example.worktestcomposeproject.auth.presentation.screens.Screens
 import com.example.worktestcomposeproject.model.FakeUsers
 import com.example.worktestcomposeproject.util.extensions.loadJsonFromAssets
-import com.example.worktestcomposeproject.util.ui.BottomNavigationBar
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
@@ -53,34 +52,33 @@ fun HomeScreen(
 ) {
     val context = LocalContext.current
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
-    var isTopBarVisible by remember { mutableStateOf(true) }
-    var isBottomBarVisible by remember { mutableStateOf(true) }
+
     val jsonString = remember { loadJsonFromAssets(context, "final.json") }
     val fakeUsersList = parseJsonUser(jsonString)
 
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-
-    LaunchedEffect(navBackStackEntry) {
-//        isTopBarVisible = navBackStackEntry?.destination?.route != Screens.Profile.route
-        isTopBarVisible = navBackStackEntry?.destination?.route != Screens.Auth.route
-        isBottomBarVisible = navBackStackEntry?.destination?.route != Screens.Auth.route
-//        isBottomBarVisible = navBackStackEntry?.destination?.route != Screens.Profile.route
-    }
 
     Scaffold(
         modifier = Modifier.fillMaxSize().nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            if (isTopBarVisible)
-                CenterAlignedTopAppBar(
-                    title = {
-                        Text(text = stringResource(id = R.string.app_name))
-                    },
-                    scrollBehavior = scrollBehavior
-                )
+            CenterAlignedTopAppBar(
+                title = {
+                    Text(text = stringResource(id = R.string.app_name))
+                },
+                scrollBehavior = scrollBehavior,
+                actions = {
+                    IconButton(
+                        onClick = {
+                            navController.navigate(Screens.Profile.route)
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Person,
+                            contentDescription = null
+                        )
+                    }
+                }
+            )
         },
-        bottomBar = {
-            if (isBottomBarVisible) BottomNavigationBar(navController = navController)
-        }
 
     ) { value ->
 
@@ -125,10 +123,12 @@ fun UserItem(user: FakeUsers, onItemClick: (FakeUsers) -> Unit) {
     ) {
         Log.d("TAG", "UserItem: ${user.picture}")
         AsyncImage(
-            model = user.picture,
+            model = "https://example.com/image.jpg",
             contentDescription = null,
             modifier = Modifier.size(48.dp),
-            contentScale = ContentScale.Crop
+            contentScale = ContentScale.Crop,
+            error = painterResource(id = R.drawable.phone),
+            placeholder = painterResource(id = R.drawable.ic_launcher_foreground)
         )
         Spacer(modifier = Modifier.width(8.dp))
         Column {

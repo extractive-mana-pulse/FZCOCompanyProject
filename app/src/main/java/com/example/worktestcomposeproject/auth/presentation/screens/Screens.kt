@@ -17,6 +17,8 @@ sealed class Screens(val route: String) {
     @Serializable
     object Register : Screens("register")
     @Serializable
+    object InputCredentials : Screens("input_credentials")
+    @Serializable
     data class Detail(
         val picture: String,
         val title: String,

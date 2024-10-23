@@ -5,7 +5,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.navigation.compose.rememberNavController
-import com.example.worktestcomposeproject.main.presentation.screens.HomeScreen
 import com.example.worktestcomposeproject.ui.theme.WorkTestComposeProjectTheme
 import com.example.worktestcomposeproject.util.navigation.NavigationGraph
 import dagger.hilt.android.AndroidEntryPoint

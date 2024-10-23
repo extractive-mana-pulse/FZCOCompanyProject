@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.serialization)
     id ("kotlin-kapt")
+    id ("kotlin-android")
     id ("dagger.hilt.android.plugin")
 }
 
@@ -12,7 +13,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.worktestcomposeproject"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -105,4 +106,13 @@ dependencies {
     // VM
     implementation (libs.androidx.lifecycle.viewmodel.compose)
     implementation (libs.androidx.lifecycle.livedata.ktx)
+
+    // DatePicker
+    implementation (libs.datetime)
+
+    // LottieFiles
+    implementation (libs.lottie)
+
+    // WheelPicker
+    implementation (libs.wheelpickercompose)
 }
